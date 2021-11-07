@@ -64,7 +64,12 @@ class BlurViewModel(application: Application) : ViewModel() {
             continuation = continuation.then(blurBuilder.build())
         }
 
+        val constraints = Constraints.Builder()
+            .setRequiresCharging(true)
+            .build()
+
         val save = OneTimeWorkRequestBuilder<SaveImageToFileWorker>()
+            .setConstraints(constraints)
             .addTag(TAG_OUTPUT)
             .build()
 
@@ -86,12 +91,16 @@ class BlurViewModel(application: Application) : ViewModel() {
 
         val imageUri = Uri.Builder()
             .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
-            .authority(resources.getResourcePackageName(R.drawable.android_cupcake))
-            .appendPath(resources.getResourceTypeName(R.drawable.android_cupcake))
-            .appendPath(resources.getResourceEntryName(R.drawable.android_cupcake))
+            .authority(resources.getResourcePackageName(R.drawable.test))
+            .appendPath(resources.getResourceTypeName(R.drawable.test))
+            .appendPath(resources.getResourceEntryName(R.drawable.test))
             .build()
 
         return imageUri
+    }
+
+    internal fun cancelWork() {
+        workManager.cancelUniqueWork(IMAGE_MANIPULATION_WORK_NAME)
     }
 
     private fun createInputDataForUri(): Data {
